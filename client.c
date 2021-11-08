@@ -1,10 +1,4 @@
-#include <stdio.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "common.h"
 
 int main() {
         struct sockaddr_in serv_addr = {0};
@@ -13,7 +7,7 @@ int main() {
         int socket_sc = socket(AF_INET, SOCK_STREAM, 0);
 
         serv_addr.sin_family = AF_INET;
-        serv_addr.sin_addr.s_addr = inet_addr("10.0.0.1");
+        serv_addr.sin_addr.s_addr = inet_addr(SERVER_IP);
         //不知道可不可以直接用80端口
         serv_addr.sin_port = htons(80);
 
