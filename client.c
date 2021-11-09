@@ -14,7 +14,7 @@ int main() {
         connect(socket_sc, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
         char* str = malloc(99);
-        memset(str, 99, 0);
+        memset(str, 0, 99);
         read(socket_sc, str, 100);
         printf("Client recv:%s", str);
 

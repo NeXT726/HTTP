@@ -30,14 +30,22 @@ int get_method(char *method)
     else return -1;
 }
 
+int parse_buffer(hheader *h, rheader *r, char *buf)
+{
+    char *header
+}
+
 int handle_request(int sock) {
     hheader headerh;
     rheader headerr[R_NM];
-
+    char *data_buffer = malloc(BUFFER_SZ);
+    memset(data_buffer, 0, BUFFER_SZ);
 
     char *buffer = malloc(BUFFER_SZ);
-    memset(buffer, BUFFER_SZ, 0);
+    memset(buffer, 0, BUFFER_SZ);
     read(sock, buffer, BUFFER_SZ);
+
+    parse_buffer(&headerh, headerr, buffer);
 
 
 
