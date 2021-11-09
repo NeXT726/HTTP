@@ -30,9 +30,41 @@ int get_method(char *method)
     else return -1;
 }
 
-int parse_buffer(hheader *h, rheader *r, char *buf)
+int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
 {
-    char *header
+    char *header;
+    header = buf;
+    char *tmp_ptr;
+    char *out_ptr;
+    char *in_ptr;
+    int in = 0;
+
+//将头部和数据部分分开，给data_buf赋值
+    strtok_r(buf, "\r\n\r\n", &out_ptr);
+    data_buf = out_ptr;
+//将固定头部，也就是第一行解析
+    out_ptr = NULL;
+    tmp_ptr = strtok_r(header, "\r\n", &out_ptr);
+
+    tmp_ptr = strtok_r(header, " ", &in_ptr);
+    strcpy(h->method, tmp_ptr);
+    tmp_ptr = strtok_r(NULL, " ", &in_ptr);
+    strcpy(h->url, tmp_ptr);
+    tmp_ptr = strtok_r(NULL, " ", &in_ptr);
+    strcpy(h->version, tmp_ptr);
+//解析可变长头部
+    while((tmp_ptr = strtok_r(NULL, "\r\n", &out_ptr)) != NULL){
+        if(in > R_NM) {
+            printf("可变长头部过多！\n");
+            return -1;
+        };
+
+        in_ptr = NULL;
+        strtok_r(tmp_ptr, ":", in_ptr);
+        strcpy(r[in].name, tmp_ptr);
+        strcpy(r[in].value, in_ptr);
+        in++;
+    }
 }
 
 int handle_request(int sock) {
@@ -45,17 +77,5 @@ int handle_request(int sock) {
     memset(buffer, 0, BUFFER_SZ);
     read(sock, buffer, BUFFER_SZ);
 
-    parse_buffer(&headerh, headerr, buffer);
-
-
-
-    char *data_buf = strstr(buffer, "\r\n\r\n");
-    data_buf = data_buf + 4;
-    char *head_buf = strtok(buffer, "\r\n\r\n");
-
-    char *sta_head = strstr(head_buf, "\r\n");
-    sta_head = sta_head + 2;
-    
-
-
+    parse_buffer(buffer, &headerh, headerr, data_buffer);
 }
