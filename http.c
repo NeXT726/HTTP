@@ -60,7 +60,7 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
         };
 
         in_ptr = NULL;
-        strtok_r(tmp_ptr, ":", in_ptr);
+        strtok_r(tmp_ptr, ":", &in_ptr);
         strcpy(r[in].name, tmp_ptr);
         strcpy(r[in].value, in_ptr);
         in++;
