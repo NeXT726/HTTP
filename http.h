@@ -10,5 +10,8 @@
 
 #define HTTP_VER "HTTP/1.0"
 
-#define METHOD_GET "GET"
-#define METHOD_POST "POST"
+#define CHAR_GET "GET"
+#define CHAR_POST "POST"
+
+#define GET 1
+#define POST 2

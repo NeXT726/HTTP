@@ -10,3 +10,12 @@ typedef struct http_header_t {
     char version[VERSION_SZ];
 } hheader;
 
+int get_method(char *method)
+{
+    if(!strcmp(CHAR_GET, method))
+        return GET;
+    else if(!strcmp(CHAR_POST, method))
+        return POST;
+    else return -1;
+}
+
