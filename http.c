@@ -49,11 +49,11 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
         *next = '\0';
         next = next + 2;
     }
-    tmp_ptr = strtok(now, ' ');
+    tmp_ptr = strtok(now, " ");
     strcpy(h->method, tmp_ptr);
-    tmp_ptr = strtok(NULL, ' ');
+    tmp_ptr = strtok(NULL, " ");
     strcpy(h->url, tmp_ptr);
-    tmp_ptr = strtok(NULL, ' ');
+    tmp_ptr = strtok(NULL, " ");
     strcpy(h->version, tmp_ptr);
   
 //解析可变长头部  
