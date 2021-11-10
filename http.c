@@ -32,38 +32,49 @@ int get_method(char *method)
 
 int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
 {
-    char *header;
-    header = buf;
-    char *tmp_ptr;
-    char *out_ptr;
-    char *in_ptr;
-    int in = 0;
+    char *now = buf;
+    char* next = NULL;
+    char *tmp_ptr = NULL;
+    int r_nm = 0;
 
 //将头部和数据部分分开，给data_buf赋值
-    strtok_r(buf, "\r\n\r\n", &out_ptr);
-    data_buf = out_ptr;
-//将固定头部，也就是第一行解析
-    out_ptr = NULL;
-    tmp_ptr = strtok_r(header, "\r\n", &out_ptr);
+    tmp_ptr = strstr(buf, "\r\n\r\n");
+    *tmp_ptr = '\0';
+    tmp_ptr = tmp_ptr + 4;
+    strcpy(data_buf, tmp_ptr);
 
-    tmp_ptr = strtok_r(header, " ", &in_ptr);
+//将固定头部，也就是第一行解析
+    next = strstr(now, "\r\n");
+    if(next != NULL) {
+        *next = '\0';
+        next = next + 2;
+    }
+    tmp_ptr = strtok(now, ' ');
     strcpy(h->method, tmp_ptr);
-    tmp_ptr = strtok_r(NULL, " ", &in_ptr);
+    tmp_ptr = strtok(NULL, ' ');
     strcpy(h->url, tmp_ptr);
-    tmp_ptr = strtok_r(NULL, " ", &in_ptr);
+    tmp_ptr = strtok(NULL, ' ');
     strcpy(h->version, tmp_ptr);
-//解析可变长头部
-    while((tmp_ptr = strtok_r(NULL, "\r\n", &out_ptr)) != NULL){
-        if(in > R_NM) {
+  
+//解析可变长头部  
+    while (next != NULL) {
+        now = next;
+        next = strstr(now, "\r\n") ;
+        if(next != NULL) {
+            *next = '\0';
+            next = next + 2;
+        }
+        
+        if(r_nm > R_NM) {
             printf("可变长头部过多！\n");
             return -1;
         };
 
-        in_ptr = NULL;
-        strtok_r(tmp_ptr, ":", &in_ptr);
-        strcpy(r[in].name, tmp_ptr);
-        strcpy(r[in].value, in_ptr);
-        in++;
+        tmp_ptr = NULL;
+        strtok_r(now, ":", &tmp_ptr);
+        strcpy(r[r_nm].name, now);
+        strcpy(r[r_nm].value, tmp_ptr);
+        r_nm++;
     }
 }
 
