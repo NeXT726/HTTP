@@ -5,10 +5,10 @@
 #define VERSION_SZ 16
 
 #define NAME_SZ 64
-#define VALUE_SZ 1024
+#define VALUE_SZ 256
 
 #define BUFFER_SZ 16*1024
-#define R_NM 16
+#define L_NM 16
 
 typedef struct http_header_t {
     char method[METHOD_SZ];
@@ -16,10 +16,17 @@ typedef struct http_header_t {
     char version[VERSION_SZ];
 } hheader;
 
-typedef struct request_header_t {
+typedef struct request_line {
     char name[NAME_SZ];
     char value[VALUE_SZ];
+} r_line;
+
+typedef struct request_header_t
+{
+    r_line line[L_NM];
+    int l_nm;
 } rheader;
+
 
 int get_method(char *method)
 {
@@ -35,7 +42,6 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
     char *now = buf;
     char* next = NULL;
     char *tmp_ptr = NULL;
-    int r_nm = 0;
 
 //将头部和数据部分分开，给data_buf赋值
     tmp_ptr = strstr(buf, "\r\n\r\n");
@@ -65,22 +71,22 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
             next = next + 2;
         }
         
-        if(r_nm > R_NM) {
+        if(r->l_nm > L_NM) {
             printf("可变长头部过多！\n");
             return -1;
         };
 
         tmp_ptr = NULL;
         strtok_r(now, ":", &tmp_ptr);
-        strcpy(r[r_nm].name, now);
-        strcpy(r[r_nm].value, tmp_ptr);
-        r_nm++;
+        strcpy(r->line[r->l_nm].name, now);
+        strcpy(r->line[r->l_nm].value, tmp_ptr);
+        r->l_nm++;
     }
 }
 
 int handle_request(int sock) {
     hheader headerh;
-    rheader headerr[R_NM];
+    rheader headerr;
     char *data_buffer = malloc(BUFFER_SZ);
     memset(data_buffer, 0, BUFFER_SZ);
 
@@ -88,5 +94,5 @@ int handle_request(int sock) {
     memset(buffer, 0, BUFFER_SZ);
     read(sock, buffer, BUFFER_SZ);
 
-    parse_buffer(buffer, &headerh, headerr, data_buffer);
+    parse_buffer(buffer, &headerh, &headerr, data_buffer);
 }
