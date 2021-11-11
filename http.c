@@ -84,9 +84,37 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
     }
 }
 
+int ack_get(char * f, int f_sz, hheader *h)
+{
+
+}
+
+int handle_get(hheader *h, rheader *r, char *data_buf)
+{
+    FILE * f = fopen(h->url, "r");
+    if(f == NULL) {
+        printf("该文件不存在\n");
+        return -1;
+    }
+    
+//这里一次把file的内容都读出来，应该使用while依次读出，后面再改
+    char * file_buff = malloc(BUFFER_SZ);
+    memset(file_buff, 0, BUFFER_SZ);
+    int file_sz = fread(file_buff, 1, BUFFER_SZ, f);
+
+    ack_get(file_buff,file_sz,  h);
+}
+
+int handle_post(hheader *h, rheader *r, char *data_buf)
+{
+    //TODO
+}
+
 int handle_request(int sock) {
     hheader headerh;
+    memset(&headerh, 0, sizeof(hheader));
     rheader headerr;
+    memset(&headerr, 0, sizeof(rheader));
     char *data_buffer = malloc(BUFFER_SZ);
     memset(data_buffer, 0, BUFFER_SZ);
 
@@ -95,4 +123,20 @@ int handle_request(int sock) {
     read(sock, buffer, BUFFER_SZ);
 
     parse_buffer(buffer, &headerh, &headerr, data_buffer);
+
+//打印收到的数据报信息
+    printf("method:%s\n", headerh.method);
+    printf("url:%s\n", headerh.url);
+    printf("version:%s\n", headerh.version);
+    printf("data:%s\n", data_buffer);
+
+//调用函数处理请求
+//目前只是实现get和post，之后实现多了可以用函数数组的方式可能更快
+    int metd = get_method(headerh.method);
+    if(metd == GET) handle_get(&headerh, &headerr, data_buffer);
+    else if(metd == POST) handle_post(&headerh, &headerr, data_buffer);
+    else {
+        printf("该请求方法还没有被实现\n");
+        return -1;
+    }
 }
