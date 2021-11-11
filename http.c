@@ -84,12 +84,7 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
     }
 }
 
-int ack_get(char * f, int f_sz, hheader *h)
-{
-
-}
-
-int handle_get(hheader *h, rheader *r, char *data_buf)
+int copy_file(hheader *h, char * buf) 
 {
     FILE * f = fopen(h->url, "r");
     if(f == NULL) {
@@ -98,14 +93,23 @@ int handle_get(hheader *h, rheader *r, char *data_buf)
     }
     
 //这里一次把file的内容都读出来，应该使用while依次读出，后面再改
-    char * file_buff = malloc(BUFFER_SZ);
-    memset(file_buff, 0, BUFFER_SZ);
-    int file_sz = fread(file_buff, 1, BUFFER_SZ, f);
-
-    ack_get(file_buff,file_sz,  h);
+    int file_sz = fread(buf + strlen(buf), 1, BUFFER_SZ - strlen(buf), f);
+    return 1;
 }
 
-int handle_post(hheader *h, rheader *r, char *data_buf)
+int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
+{
+    char * ack_buff = malloc(BUFFER_SZ);
+    memset(ack_buff, 0, BUFFER_SZ);
+    strcpy(ack_buff, h->version);
+    strcpy(ack_buff + strlen(ack_buff), " 200 OK\r\n\r\n");
+    
+    copy_file(h, ack_buff);
+    write(sock, ack_buff, strlen(ack_buff));
+    return 1;
+}
+
+int handle_post(int sock, hheader *h, rheader *r, char *data_buf)
 {
     //TODO
 }
@@ -124,7 +128,7 @@ int handle_request(int sock) {
 
     parse_buffer(buffer, &headerh, &headerr, data_buffer);
 
-//打印收到的数据报信息
+//打印收到的数据报信息,这里的headerr中的可变长首部部分好像没有解析掉冒号后的空格//TODO
     printf("method:%s\n", headerh.method);
     printf("url:%s\n", headerh.url);
     printf("version:%s\n", headerh.version);
@@ -133,8 +137,8 @@ int handle_request(int sock) {
 //调用函数处理请求
 //目前只是实现get和post，之后实现多了可以用函数数组的方式可能更快
     int metd = get_method(headerh.method);
-    if(metd == GET) handle_get(&headerh, &headerr, data_buffer);
-    else if(metd == POST) handle_post(&headerh, &headerr, data_buffer);
+    if(metd == GET) handle_get(sock, &headerh, &headerr, data_buffer);
+    else if(metd == POST) handle_post(sock, &headerh, &headerr, data_buffer);
     else {
         printf("该请求方法还没有被实现\n");
         return -1;
