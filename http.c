@@ -86,13 +86,14 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
 
 int copy_file(hheader *h, char * buf) 
 {
-    FILE * f = fopen(h->url, "r");
+//这里是为了把url中的'/'去掉，文件路径的解析依旧需要优化 //TODO
+    FILE * f = fopen(h->url+1, "r");
     if(f == NULL) {
         printf("该文件不存在\n");
         return -1;
     }
     
-//这里一次把file的内容都读出来，应该使用while依次读出，后面再改
+//这里一次把file的内容都读出来，应该使用while依次读出，后面再改 //TODO
     int file_sz = fread(buf + strlen(buf), 1, BUFFER_SZ - strlen(buf), f);
     return 1;
 }
