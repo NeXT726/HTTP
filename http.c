@@ -1,6 +1,6 @@
 #include "http.h"
 
-#define METHOD_SZ 4
+#define METHOD_SZ 16
 #define URL_SZ 1024
 #define VERSION_SZ 16
 
@@ -114,6 +114,15 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
 int handle_post(int sock, hheader *h, rheader *r, char *data_buf)
 {
     //TODO
+    FILE * f = fopen(h->url+1, "a");
+    fwrite(data_buf, 1, BUFFER_SZ, f);
+
+    char * ack_buff = malloc(BUFFER_SZ);
+    memset(ack_buff, 0, BUFFER_SZ);
+    strcpy(ack_buff, h->version);
+    strcpy(ack_buff + strlen(ack_buff), " 200 OK\r\n\r\n");
+    write(sock, ack_buff, strlen(ack_buff));
+    return 1;
 }
 
 int handle_request(int sock) {
