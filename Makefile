@@ -1,10 +1,10 @@
 main : client server
 
 client : client.c http.h http.c
-	gcc client.c -o client
+	gcc client.c http.c -o client
 
 server : server.c http.h http.c
-	gcc server.c -o server
+	gcc server.c http.c -o server
 
 clean :
-	rm client server
+	rm -rf client server

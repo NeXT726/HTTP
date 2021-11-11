@@ -29,8 +29,7 @@ int main() {
         while (1) {
                 int adr_size = sizeof(clie_addr);
                 int socket_acc = accept(socket_listen, (struct sockaddr*)&clie_addr, &adr_size);
-                char *str = "Hello World!\n";
-                write(socket_acc, str, strlen(str));
+                handle_request(socket_acc);
                 close(socket_acc);
         }
 

@@ -15,3 +15,6 @@
 
 #define GET 1
 #define POST 2
+
+
+int handle_request(int sock);

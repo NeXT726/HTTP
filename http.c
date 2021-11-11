@@ -105,6 +105,7 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
     strcpy(ack_buff + strlen(ack_buff), " 200 OK\r\n\r\n");
     
     copy_file(h, ack_buff);
+    printf("%s\n:", ack_buff);
     write(sock, ack_buff, strlen(ack_buff));
     return 1;
 }
@@ -150,6 +151,6 @@ int get_request(int sock, char * url)
     char * ack_buff = malloc(BUFFER_SZ);
     memset(ack_buff, 0, BUFFER_SZ);
     strcpy(ack_buff, "GET djl HTTP/1.0\r\n\r\n");
-    
+
     write(sock, ack_buff, strlen(ack_buff));
 }
