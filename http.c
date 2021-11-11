@@ -113,9 +113,10 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
 
 int handle_post(int sock, hheader *h, rheader *r, char *data_buf)
 {
-    //TODO
     FILE * f = fopen(h->url+1, "a");
-    fwrite(data_buf, 1, BUFFER_SZ, f);
+    fwrite(data_buf, 1, strlen(data_buf), f);
+//要记得关闭文件，否则不会真正的写入文件。
+    fclose(f);
 
     char * ack_buff = malloc(BUFFER_SZ);
     memset(ack_buff, 0, BUFFER_SZ);
