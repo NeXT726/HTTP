@@ -79,7 +79,8 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
         tmp_ptr = NULL;
         strtok_r(now, ":", &tmp_ptr);
         strcpy(r->line[r->l_nm].name, now);
-        strcpy(r->line[r->l_nm].value, tmp_ptr);
+//为了去掉可变长头部冒号后面的空格，可能有更漂亮的优化方式
+        strcpy(r->line[r->l_nm].value, tmp_ptr+1);
         r->l_nm++;
     }
 }
@@ -140,10 +141,11 @@ int handle_request(int sock) {
 
     parse_buffer(buffer, &headerh, &headerr, data_buffer);
 
-//打印收到的数据报信息,这里的headerr中的可变长首部部分好像没有解析掉冒号后的空格//TODO
     printf("method:%s\n", headerh.method);
     printf("url:%s\n", headerh.url);
     printf("version:%s\n", headerh.version);
+    //printf("first name:%s\n", headerr.line[0].name);
+    //printf("first value:%s\n", headerr.line[0].value);
     printf("data:%s\n", data_buffer);
 
 //调用函数处理请求
