@@ -1,14 +1,16 @@
 #include "http.h"
 
 #define METHOD_SZ 16
-#define URL_SZ 1024
+#define URL_SZ 512
 #define VERSION_SZ 16
 
-#define NAME_SZ 64
-#define VALUE_SZ 256
-
-#define BUFFER_SZ 16*1024
 #define L_NM 16
+#define NAME_SZ 64
+#define VALUE_SZ 128
+
+#define BUFFER_SZ 1500
+#define FILE_SZ 16*1024
+#define CHUNK_SZ 256
 
 typedef struct http_header_t {
     char method[METHOD_SZ];
@@ -93,9 +95,33 @@ int copy_file(hheader *h, char * buf)
         printf("该文件不存在\n");
         return -1;
     }
-    
+
 //这里一次把file的内容都读出来，应该使用while依次读出，后面再改 //TODO
-    int file_sz = fread(buf + strlen(buf), 1, BUFFER_SZ - strlen(buf), f);
+    int file_sz = fread(buf, 1, BUFFER_SZ - strlen(buf), f);
+    return file_sz;
+}
+
+int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
+{
+    if(!is_chunk){
+        strcpy(ack_buf + sizeof(ack_buf), f_sz);
+        write(sock, ack_buf, strlen(ack_buf));
+        return 1;
+    }
+    
+    int f_now = 0;
+    int one_send;
+    while(f_now < f_sz){
+        one_send = ((f_sz-f_now) < CHUNK_SZ) ? (f_sz - f_now) : CHUNK_SZ;
+        sprintf(ack_buf + sizeof(ack_buf), "%x\r\n", one_send);
+        memcpy(ack_buf, file_buf + f_now, one_send);
+        strcpy(ack_buf + sizeof(ack_buf), "\r\n");
+        write(sock, ack_buf, strlen(ack_buf));
+        memset(ack_buf, 0, BUFFER_SZ);
+        f_now =+ one_send;
+    }
+    strcpy(ack_buf, "0\r\n");
+    write(sock, ack_buf, strlen(ack_buf));
     return 1;
 }
 
@@ -103,13 +129,15 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
 {
     char * ack_buff = malloc(BUFFER_SZ);
     memset(ack_buff, 0, BUFFER_SZ);
+    char * file_buff = malloc(FILE_SZ);
+    memset(file_buff, 0, FILE_SZ);
+
     strcpy(ack_buff, h->version);
     strcpy(ack_buff + strlen(ack_buff), OK);
     strcpy(ack_buff + strlen(ack_buff), "\r\n");
     
-    copy_file(h, ack_buff);
-    printf("%s\n:", ack_buff);
-    write(sock, ack_buff, strlen(ack_buff));
+    int file_sz = copy_file(h, file_buff);
+    ack_get(sock, ack_buff, file_buff, file_sz);
     return 1;
 }
 
