@@ -16,5 +16,9 @@
 #define GET 1
 #define POST 2
 
+#define OK " 200 OK\r\n"
+#define IS_CHUNK "Transfer-Encoding: chunked\r\n"
+
+int is_chunk = 1;
 
 int handle_request(int sock);

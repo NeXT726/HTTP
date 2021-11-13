@@ -104,7 +104,8 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
     char * ack_buff = malloc(BUFFER_SZ);
     memset(ack_buff, 0, BUFFER_SZ);
     strcpy(ack_buff, h->version);
-    strcpy(ack_buff + strlen(ack_buff), " 200 OK\r\n\r\n");
+    strcpy(ack_buff + strlen(ack_buff), OK);
+    strcpy(ack_buff + strlen(ack_buff), "\r\n");
     
     copy_file(h, ack_buff);
     printf("%s\n:", ack_buff);
@@ -122,7 +123,8 @@ int handle_post(int sock, hheader *h, rheader *r, char *data_buf)
     char * ack_buff = malloc(BUFFER_SZ);
     memset(ack_buff, 0, BUFFER_SZ);
     strcpy(ack_buff, h->version);
-    strcpy(ack_buff + strlen(ack_buff), " 200 OK\r\n\r\n");
+    strcpy(ack_buff + strlen(ack_buff), OK);
+    strcpy(ack_buff + strlen(ack_buff), "\r\n");
     write(sock, ack_buff, strlen(ack_buff));
     return 1;
 }
