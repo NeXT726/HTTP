@@ -106,7 +106,7 @@ int copy_file(hheader *h, char * buf)
 int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
 {
     if(!is_chunk){
-        strcpy(ack_buf + sizeof(ack_buf), file_buf);
+        strcpy(ack_buf + strlen(ack_buf), file_buf);
         write(sock, ack_buf, strlen(ack_buf));
         return 1;
     }
@@ -115,14 +115,14 @@ int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
     int one_send;
     while(f_now < f_sz){
         one_send = ((f_sz-f_now) < CHUNK_SZ) ? (f_sz - f_now) : CHUNK_SZ;
-        sprintf(ack_buf + sizeof(ack_buf), "%x\r\n", one_send);
-        memcpy(ack_buf, file_buf + f_now, one_send);
-        strcpy(ack_buf + sizeof(ack_buf), "\r\n");
-        write(sock, ack_buf, strlen(ack_buf));
-        memset(ack_buf, 0, BUFFER_SZ);
+        sprintf(ack_buf + strlen(ack_buf), "%x\r\n", one_send);
+        memcpy(ack_buf + strlen(ack_buf), file_buf + f_now, one_send);
+        strcpy(ack_buf + strlen(ack_buf), "\r\n");
         f_now =+ one_send;
     }
-    strcpy(ack_buf, "0\r\n");
+    strcpy(ack_buf + strlen(ack_buf), "0\r\n\r\n");
+
+    printf("ack_buf:%s\n", ack_buf);
     write(sock, ack_buf, strlen(ack_buf));
     return 1;
 }
@@ -136,10 +136,9 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
 
     strcpy(ack_buff, h->version);
     strcpy(ack_buff + strlen(ack_buff), OK);
+    if(is_chunk) strcpy(ack_buff + strlen(ack_buff) , IS_CHUNK);
     strcpy(ack_buff + strlen(ack_buff), "\r\n");
 
-    if(is_chunk) strcpy(ack_buff, IS_CHUNK);
-    
     int file_sz = copy_file(h, file_buff);
     ack_get(sock, ack_buff, file_buff, file_sz);
     return 1;
