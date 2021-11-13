@@ -137,6 +137,8 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
     strcpy(ack_buff, h->version);
     strcpy(ack_buff + strlen(ack_buff), OK);
     strcpy(ack_buff + strlen(ack_buff), "\r\n");
+
+    if(is_chunk) strcpy(ack_buff, IS_CHUNK);
     
     int file_sz = copy_file(h, file_buff);
     ack_get(sock, ack_buff, file_buff, file_sz);
