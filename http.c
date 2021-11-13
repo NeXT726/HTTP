@@ -12,6 +12,8 @@
 #define FILE_SZ 16*1024
 #define CHUNK_SZ 256
 
+int is_chunk = 1;
+
 typedef struct http_header_t {
     char method[METHOD_SZ];
     char url[URL_SZ];
@@ -104,7 +106,7 @@ int copy_file(hheader *h, char * buf)
 int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
 {
     if(!is_chunk){
-        strcpy(ack_buf + sizeof(ack_buf), f_sz);
+        strcpy(ack_buf + sizeof(ack_buf), file_buf);
         write(sock, ack_buf, strlen(ack_buf));
         return 1;
     }

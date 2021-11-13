@@ -19,6 +19,6 @@
 #define OK " 200 OK\r\n"
 #define IS_CHUNK "Transfer-Encoding: chunked\r\n"
 
-int is_chunk = 1;
+extern int is_chunk;
 
 int handle_request(int sock);
