@@ -1,10 +1,13 @@
+HF := http.h head.h
+CF := http.c head.c
+
 main : client server
 
-client : client.c http.h http.c
-	gcc client.c http.c -o client
+client : client.c $(HF) $(CF)
+	gcc -o client client.c $(CF) 
 
-server : server.c http.h http.c
-	gcc server.c http.c -o server
+server : server.c $(HF) $(CF)
+	gcc -o server server.c $(CF)
 
 clean :
 	rm -rf client server
