@@ -55,6 +55,8 @@ int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
     return 1;
 }
 
+//这里有严重的bug，strlen会导致字符串的解析出现问题，零值的出现很普遍，并不一定在字符串结尾。
+//先以全1作为测试，后续再改TODO
 int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
 {
     char * ack_buff = malloc(BUFFER_SZ);
