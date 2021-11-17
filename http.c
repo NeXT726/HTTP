@@ -190,6 +190,8 @@ int handle_request(int sock) {
         printf("该请求方法还没有被实现\n");
         return -1;
     }
+
+    close(sock);
 }
 
 int get_request(int sock, char * url)
