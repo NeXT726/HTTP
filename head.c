@@ -8,16 +8,6 @@
 
 #include "head.h"
 
-
-int get_method(char *method)
-{
-    if(!strcmp(CHAR_GET, method))
-        return GET;
-    else if(!strcmp(CHAR_POST, method))
-        return POST;
-    else return -1;
-}
-
 int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
 {
     char *now = buf;
@@ -64,4 +54,22 @@ int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf)
         strcpy(r->line[r->l_nm].value, tmp_ptr+1);
         r->l_nm++;
     }
+}
+
+int get_method(char *method)
+{
+    if(!strcmp(CHAR_GET, method))
+        return GET;
+    else if(!strcmp(CHAR_POST, method))
+        return POST;
+    else return -1;
+}
+
+int is_alive(rheader *r)
+{
+    for(int i = 0; i < r->l_nm; i++){
+        if(!strcmp(r->line[i].name, "Connection") && !strcmp(r->line[i].value, "Keep-Alive")) 
+            return 1;
+    }
+    return 0;
 }

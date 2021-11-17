@@ -4,5 +4,6 @@
 
         int get_method(char *method);
         int parse_buffer(char *buf, hheader *h, rheader *r, char *data_buf);
-
+        int is_alive(rheader *r);
+        
 #endif

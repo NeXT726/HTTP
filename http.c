@@ -22,7 +22,8 @@ int copy_file(hheader *h, char * buf)
     }
 
 //这里一次把file的内容都读出来，应该使用while依次读出，后面再改 //TODO
-    int file_sz = fread(buf, 1, BUFFER_SZ - strlen(buf), f);
+    int file_sz = fread(buf, 1, FILE_SZ - strlen(buf), f);
+    printf("file size : %d\n", file_sz);
     return file_sz;
 }
 
@@ -41,7 +42,11 @@ int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
         sprintf(ack_buf + strlen(ack_buf), "%x\r\n", one_send);
         memcpy(ack_buf + strlen(ack_buf), file_buf + f_now, one_send);
         strcpy(ack_buf + strlen(ack_buf), "\r\n");
-        f_now =+ one_send;
+        write(sock, ack_buf, strlen(ack_buf));
+        //printf("ack_buf:%ld\t", strlen(ack_buf));
+        memset(ack_buf, 0, BUFFER_SZ);
+        f_now = f_now + one_send;
+        //printf("f_now:%d\n", f_now);
     }
     strcpy(ack_buf + strlen(ack_buf), "0\r\n\r\n");
 
@@ -60,6 +65,8 @@ int handle_get(int sock, hheader *h, rheader *r, char *data_buf)
     strcpy(ack_buff, h->version);
     strcpy(ack_buff + strlen(ack_buff), OK);
     if(is_chunk) strcpy(ack_buff + strlen(ack_buff) , IS_CHUNK);
+    strcpy(ack_buff + strlen(ack_buff) , "Connection: Keep-Alive\r\n");
+    printf("ack_head:%s\n", ack_buff);
     strcpy(ack_buff + strlen(ack_buff), "\r\n");
 
     int file_sz = copy_file(h, file_buff);
@@ -114,14 +121,6 @@ int handle_request(int sock) {
         return -1;
     }
 
-    close(sock);
-}
-
-int get_request(int sock, char * url)
-{
-    char * ack_buff = malloc(BUFFER_SZ);
-    memset(ack_buff, 0, BUFFER_SZ);
-    strcpy(ack_buff, "GET djl HTTP/1.0\r\n\r\n");
-
-    write(sock, ack_buff, strlen(ack_buff));
+    //close(sock);
+    //if(!is_alive(&headerr)) close(sock);
 }

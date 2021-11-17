@@ -1,4 +1,4 @@
-HF := http.h head.h
+HF := http.h head.h def.h
 CF := http.c head.c
 
 main : client server

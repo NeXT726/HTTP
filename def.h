@@ -20,8 +20,8 @@
         #define VALUE_SZ 128
 
         #define BUFFER_SZ 1500
-        #define FILE_SZ 16*1024
-        #define CHUNK_SZ 256
+        #define FILE_SZ 2*1024*1024
+        #define CHUNK_SZ 512
         
         typedef struct http_header_t {
             char method[METHOD_SZ];
