@@ -38,7 +38,7 @@ int main() {
                 int adr_size = sizeof(clie_addr);
                 int socket_acc = accept(socket_listen, (struct sockaddr*)&clie_addr, &adr_size);
                 handle_request(socket_acc);
-                close(socket_acc);
+                //close(socket_acc);
         }
 
         close(socket_listen);

@@ -50,7 +50,7 @@ int ack_get(int sock, char *ack_buf, char *file_buf, int f_sz)
     }
     strcpy(ack_buf + strlen(ack_buf), "0\r\n\r\n");
 
-    printf("ack_buf:%s\n", ack_buf);
+    //printf("ack_buf:%s\n", ack_buf);
     write(sock, ack_buf, strlen(ack_buf));
     return 1;
 }
@@ -111,7 +111,7 @@ int handle_request(int sock) {
     printf("version:%s\n", headerh.version);
     //printf("first name:%s\n", headerr.line[0].name);
     //printf("first value:%s\n", headerr.line[0].value);
-    printf("data:%s\n", data_buffer);
+    printf("data:%s\n\n", data_buffer);
 
 //调用函数处理请求
 //目前只是实现get和post，之后实现多了可以用函数数组的方式可能更快
@@ -124,5 +124,6 @@ int handle_request(int sock) {
     }
 
     //close(sock);
-    //if(!is_alive(&headerr)) close(sock);
+    if(!is_alive(&headerr)) close(sock);
+    else printf("keep-alive\n");
 }
